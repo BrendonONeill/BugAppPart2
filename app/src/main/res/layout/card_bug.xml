@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:elevation="24dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="255dp"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/imageIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="16dp"
+            app:srcCompat="@drawable/brendon1" />
+
+        <TextView
+            android:id="@+id/bugFormTitle"
+            android:layout_width="400dp"
+            android:layout_height="40dp"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="110dp"
+            android:text="TextView"
+            android:textStyle="bold"
+            android:textSize="28sp"
+            tools:text="Dialogue System" />
+
+        <TextView
+            android:id="@+id/bugFormNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/importanceNumber"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/bugDescription"
+            android:layout_width="350dp"
+            android:layout_height="70dp"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="116dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="55dp"
+            android:ems="10"
+            android:inputType="textMultiLine"
+            android:textSize="20dp" />
+
+        <ImageButton
+            android:id="@+id/bugDelete"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="275dp"
+            android:layout_marginBottom="1dp"
+            android:src="@android:drawable/ic_menu_delete" />
+
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

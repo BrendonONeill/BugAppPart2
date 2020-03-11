@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ie.wit.activities.Report">
+
+    <item
+        android:id="@+id/action_bugForms"
+        android:orderInCategory="100"
+        android:title="@string/action_bugTrackingForm"
+        app:showAsAction="never" />
+</menu>
