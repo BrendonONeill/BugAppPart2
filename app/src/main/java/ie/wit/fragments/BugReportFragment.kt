@@ -6,19 +6,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.ItemTouchHelper
 
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ie.wit.Adapters.BugTrackingAdapter
-import ie.wit.Adapters.DeleteListener
+
 import ie.wit.R
 import ie.wit.main.BugTrackingApp
 import ie.wit.models.BugTrackingModel
+import ie.wit.utils.SwipeToDeleteCallback
 import kotlinx.android.synthetic.main.fragment_bug_report.view.*
 
 
-class BugReportFragment : Fragment(), DeleteListener {
+class BugReportFragment : Fragment() {
 
     lateinit var app: BugTrackingApp
+    lateinit var root: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +39,17 @@ class BugReportFragment : Fragment(), DeleteListener {
 
 
         root.recyclerView.setLayoutManager(LinearLayoutManager(activity))
-        root.recyclerView.adapter = BugTrackingAdapter(app.bugTrackingsStore.findAll(),this)
+        root.recyclerView.adapter = BugTrackingAdapter(app.bugTrackingsStore.findAll() as ArrayList<BugTrackingModel>)
 
+        val swipeDeleteHandler = object : SwipeToDeleteCallback(activity!!) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = root.recyclerView.adapter as BugTrackingAdapter
+                adapter.removeAt(viewHolder.adapterPosition)
+
+            }
+        }
+        val itemTouchDeleteHelper = ItemTouchHelper(swipeDeleteHandler)
+        itemTouchDeleteHelper.attachToRecyclerView(root.recyclerView)
         return root
     }
 
@@ -47,17 +61,7 @@ class BugReportFragment : Fragment(), DeleteListener {
             }
     }
 
-    override fun onDeleteClick(bugTracking: BugTrackingModel) {
-        app.bugTrackingsStore.delete(bugTracking.copy())
-
-        val fragment = BugReportFragment()
-        val fragmentManager = activity!!.supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.homeFrame, fragment)
-        fragmentTransaction.addToBackStack(null)
-        fragmentTransaction.commit()
-
-    }
+    
 
 
 }

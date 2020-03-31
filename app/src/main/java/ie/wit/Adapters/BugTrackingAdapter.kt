@@ -11,13 +11,10 @@ import kotlinx.android.synthetic.main.fragment_bug_tracking.view.*
 
 
 
-interface DeleteListener {
-    fun onDeleteClick(bugTracking: BugTrackingModel)
-}
+
 
 class BugTrackingAdapter constructor
-    (private var bugTrackings: List<BugTrackingModel>,
-     private val dlistener: DeleteListener)
+    (var bugs: ArrayList<BugTrackingModel>)
 
     : RecyclerView.Adapter<BugTrackingAdapter.MainHolder>() {
 
@@ -32,25 +29,28 @@ class BugTrackingAdapter constructor
     }
 
     override fun onBindViewHolder(holder: MainHolder, position: Int) {
-        val bugTracking = bugTrackings[holder.adapterPosition]
-        holder.bind(bugTracking, dlistener)
+        val bugTracking = bugs[holder.adapterPosition]
+        holder.bind(bugTracking)
     }
 
-    override fun getItemCount(): Int = bugTrackings.size
+    override fun getItemCount(): Int = bugs.size
+
+    fun removeAt(position: Int) {
+        bugs.removeAt(position)
+        notifyItemRemoved(position)
+    }
 
     class MainHolder constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(
-            bugTracking: BugTrackingModel,
-            dlistener: DeleteListener
+            bugTracking: BugTrackingModel
+
         ) {
             itemView.bugFormTitle.text = bugTracking.title
             itemView.bugDescription.text = bugTracking.descriptions
             itemView.bugFormNumber.text = bugTracking.bugimportance
             itemView.imageIcon.setImageResource(R.mipmap.ic_launcher_round)
-            itemView.bugDelete.setOnClickListener {
-                (dlistener.onDeleteClick(bugTracking))
+
             }
         }
     }
-}

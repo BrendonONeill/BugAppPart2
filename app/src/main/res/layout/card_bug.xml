@@ -10,7 +10,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="255dp"
+        android:layout_height="match_parent"
         android:padding="16dp">
 
         <ImageView
@@ -22,19 +22,32 @@
             android:layout_marginRight="16dp"
             app:srcCompat="@drawable/brendon1" />
 
+
         <TextView
             android:id="@+id/bugFormTitle"
-            android:layout_width="400dp"
+            android:layout_width="250dp"
             android:layout_height="40dp"
+            android:layout_alignParentTop="true"
 
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="110dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/imageIcon"
             android:text="TextView"
-            android:textStyle="bold"
             android:textSize="28sp"
+            android:textStyle="bold"
             tools:text="Dialogue System" />
+
+
+        <ImageView
+            android:id="@+id/imagefavourite"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="70dp"
+
+            android:layout_toEndOf="@+id/bugDescription"
+            app:srcCompat="@android:drawable/star_big_off" />
 
         <TextView
             android:id="@+id/bugFormNumber"
@@ -43,35 +56,23 @@
 
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/importanceNumber"
-            android:textSize="24sp" />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/bugDescription"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="70dp"
 
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="116dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="55dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="70dp"
             android:ems="10"
             android:inputType="textMultiLine"
             android:textSize="20dp" />
 
-        <ImageButton
-            android:id="@+id/bugDelete"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="275dp"
-            android:layout_marginBottom="1dp"
-            android:src="@android:drawable/ic_menu_delete" />
-
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
+
