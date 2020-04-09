@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 //import com.google.firebase.quickstart.auth.R
 import ie.wit.R
 import ie.wit.main.BugTrackingApp
@@ -193,6 +194,7 @@ class Login : AppCompatActivity(), View.OnClickListener {
             signedInButtons.visibility = View.VISIBLE
 
             verifyEmailButton.isEnabled = !user.isEmailVerified
+            app.database = FirebaseDatabase.getInstance().reference
             startActivity<Home>()
         } else {
             status.setText(R.string.signed_out)

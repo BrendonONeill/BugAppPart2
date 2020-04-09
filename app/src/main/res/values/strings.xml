@@ -23,6 +23,11 @@
     <string name="aboutus_message">Hi, I\'m Brendon O\'Neill\n\nThis is my Bug Tracking App\n\n Hope you like it</string>
 
 
+    <string name="action_edit">Edit Bug Record</string>
+    <string name="action_update">Update</string>
+    <string name="message_edit">Please Update your Details Below</string>
+
+
 
 
 
