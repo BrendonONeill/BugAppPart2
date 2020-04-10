@@ -1,5 +1,6 @@
 package ie.wit.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -7,9 +8,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.SignInButton
+import com.google.android.gms.common.api.ApiException
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 //import com.google.firebase.quickstart.auth.R
 import ie.wit.R
 import ie.wit.main.BugTrackingApp
@@ -17,17 +27,10 @@ import ie.wit.main.BugTrackingApp
 import ie.wit.utils.createLoader
 import ie.wit.utils.hideLoader
 import ie.wit.utils.showLoader
-import kotlinx.android.synthetic.main.login.detail
-import kotlinx.android.synthetic.main.login.emailCreateAccountButton
-import kotlinx.android.synthetic.main.login.emailPasswordButtons
-import kotlinx.android.synthetic.main.login.emailPasswordFields
-import kotlinx.android.synthetic.main.login.emailSignInButton
-import kotlinx.android.synthetic.main.login.fieldEmail
-import kotlinx.android.synthetic.main.login.fieldPassword
-import kotlinx.android.synthetic.main.login.signOutButton
-import kotlinx.android.synthetic.main.login.signedInButtons
-import kotlinx.android.synthetic.main.login.status
-import kotlinx.android.synthetic.main.login.verifyEmailButton
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import kotlinx.android.synthetic.main.home.*
+import kotlinx.android.synthetic.main.login.*
+import kotlinx.android.synthetic.main.nav_header_home.view.*
 import org.jetbrains.anko.startActivity
 
 class Login : AppCompatActivity(), View.OnClickListener {
@@ -44,23 +47,36 @@ class Login : AppCompatActivity(), View.OnClickListener {
         emailCreateAccountButton.setOnClickListener(this)
         signOutButton.setOnClickListener(this)
         verifyEmailButton.setOnClickListener(this)
+        sign_in_button.setOnClickListener(this)
 
-        // [START initialize_auth]
-        // Initialize Firebase Auth
+
         app.auth = FirebaseAuth.getInstance()
-        // [END initialize_auth]
+
+        // [START config_signin]
+        // Configure Google Sign In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        // [END config_signin]
+
+
+        app.googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         loader = createLoader(this)
+
+        sign_in_button.setSize(SignInButton.SIZE_WIDE)
+        sign_in_button.setColorScheme(0)
+
+
     }
 
-    // [START on_start_check_user]
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = app.auth.currentUser
         updateUI(currentUser)
     }
-    // [END on_start_check_user]
 
     private fun createAccount(email: String, password: String) {
         Log.d(TAG, "createAccount:$email")
@@ -69,7 +85,6 @@ class Login : AppCompatActivity(), View.OnClickListener {
         }
 
         showLoader(loader, "Creating Account...")
-
         // [START create_user_with_email]
         app.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -85,7 +100,6 @@ class Login : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT).show()
                     updateUI(null)
                 }
-
                 // [START_EXCLUDE]
                 hideLoader(loader)
                 // [END_EXCLUDE]
@@ -98,9 +112,7 @@ class Login : AppCompatActivity(), View.OnClickListener {
         if (!validateForm()) {
             return
         }
-
         showLoader(loader, "Logging In...")
-
         // [START sign_in_with_email]
         app.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -116,7 +128,6 @@ class Login : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT).show()
                     updateUI(null)
                 }
-
                 // [START_EXCLUDE]
                 if (!task.isSuccessful) {
                     status.setText(R.string.auth_failed)
@@ -129,6 +140,7 @@ class Login : AppCompatActivity(), View.OnClickListener {
 
     private fun signOut() {
         app.auth.signOut()
+        app.googleSignInClient.signOut()
         updateUI(null)
     }
 
@@ -194,6 +206,7 @@ class Login : AppCompatActivity(), View.OnClickListener {
             signedInButtons.visibility = View.VISIBLE
 
             verifyEmailButton.isEnabled = !user.isEmailVerified
+            app.storage = FirebaseStorage.getInstance().reference
             app.database = FirebaseDatabase.getInstance().reference
             startActivity<Home>()
         } else {
@@ -213,10 +226,71 @@ class Login : AppCompatActivity(), View.OnClickListener {
             R.id.emailSignInButton -> signIn(fieldEmail.text.toString(), fieldPassword.text.toString())
             R.id.signOutButton -> signOut()
             R.id.verifyEmailButton -> sendEmailVerification()
+            R.id.sign_in_button -> googleSignIn()
         }
     }
 
     companion object {
         private const val TAG = "EmailPassword"
+        private const val RC_SIGN_IN = 9001
     }
+
+
+    // [START onactivityresult]
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)
+                firebaseAuthWithGoogle(account!!)
+            } catch (e: ApiException) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e)
+                // [START_EXCLUDE]
+                updateUI(null)
+                // [END_EXCLUDE]
+            }
+        }
+    }
+    // [END onactivityresult]
+
+    // [START google signin]
+    private fun googleSignIn() {
+        val signInIntent = app.googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+    // [END google signin]
+
+    // [START auth_with_google]
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.id!!)
+        // [START_EXCLUDE silent]
+        showLoader(loader, "Logging In with Google...")
+        // [END_EXCLUDE]
+
+        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        app.auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = app.auth.currentUser
+                    updateUI(user)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Snackbar.make(main_layout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
+                    updateUI(null)
+                }
+
+                // [START_EXCLUDE]
+                hideLoader(loader)
+                // [END_EXCLUDE]
+            }
+    }
+    // [END auth_with_google]
 }

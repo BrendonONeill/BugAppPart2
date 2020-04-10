@@ -72,7 +72,7 @@ class BugTrackingFragment : Fragment(), AnkoLogger {
             else if (BugRadio.checkedRadioButtonId == R.id.Bug5) "5" else "0"
 
 
-            writeNewBugTracking(BugTrackingModel(title = title, descriptions = description, bugimportance = bugNumber,
+            writeNewBugTracking(BugTrackingModel(title = title, descriptions = description, bugimportance = bugNumber, profilepic = app.userImage.toString(),
                 email = app.auth.currentUser?.email))
 
             val fragment = BugReportFragment()

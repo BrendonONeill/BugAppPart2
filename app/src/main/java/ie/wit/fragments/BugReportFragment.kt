@@ -19,7 +19,7 @@ import ie.wit.Adapters.BugListener
 import ie.wit.Adapters.BugTrackingAdapter
 
 import ie.wit.R
-import ie.wit.api.BugTrackingWrapper
+
 import ie.wit.main.BugTrackingApp
 import ie.wit.models.BugTrackingModel
 import ie.wit.utils.*
@@ -28,7 +28,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 
 
-class BugReportFragment : Fragment() , BugListener, AnkoLogger  {
+open class BugReportFragment : Fragment() , BugListener, AnkoLogger  {
 
     lateinit var app: BugTrackingApp
     lateinit var loader : AlertDialog
@@ -86,7 +86,7 @@ class BugReportFragment : Fragment() , BugListener, AnkoLogger  {
             }
     }
 
-    fun setSwipeRefresh() {
+    open fun setSwipeRefresh() {
         root.swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
             override fun onRefresh() {
                 root.swiperefresh.isRefreshing = true
@@ -138,13 +138,14 @@ class BugReportFragment : Fragment() , BugListener, AnkoLogger  {
 
     override fun onResume() {
         super.onResume()
-        getAllBugs(app.auth.currentUser!!.uid)
+        if(this::class == BugReportFragment::class)
+            getAllBugs(app.auth.currentUser!!.uid)
     }
 
     fun getAllBugs(userId: String?) {
         loader = createLoader(activity!!)
         showLoader(loader, "Downloading Donations from Firebase")
-        val donationsList = ArrayList<BugTrackingModel>()
+        val bugsList = ArrayList<BugTrackingModel>()
         app.database.child("user-bugTrackings").child(userId!!)
             .addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
@@ -155,12 +156,12 @@ class BugReportFragment : Fragment() , BugListener, AnkoLogger  {
                     hideLoader(loader)
                     val children = snapshot.children
                     children.forEach {
-                        val donation = it.
+                        val bug = it.
                             getValue<BugTrackingModel>(BugTrackingModel::class.java)
 
-                        donationsList.add(donation!!)
+                        bugsList.add(bug!!)
                         root.recyclerView.adapter =
-                            BugTrackingAdapter(donationsList, this@BugReportFragment)
+                            BugTrackingAdapter(bugsList, this@BugReportFragment, false)
                         root.recyclerView.adapter?.notifyDataSetChanged()
                         checkSwipeRefresh()
 

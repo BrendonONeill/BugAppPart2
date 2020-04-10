@@ -14,6 +14,7 @@ data class BugTrackingModel(
     var bugimportance: String = "N/A",
     var message: String = "the message",
     var upvotes: Int = 0,
+    var profilepic: String = "",
     var email: String? = "Brendon@wit.ie")
     : Parcelable
 
@@ -28,7 +29,8 @@ data class BugTrackingModel(
             "bugimportance" to bugimportance,
             "message" to message,
             "upvote" to upvotes,
-            "email" to email
+            "email" to email,
+            "profilepic" to profilepic
         )
     }
 }
