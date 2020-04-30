@@ -1,7 +1,9 @@
 package ie.wit.activities
 
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -9,15 +11,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.firebase.ui.auth.AuthUI
+
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import ie.wit.R
-import ie.wit.fragments.AboutUs
-import ie.wit.fragments.BugAllReportsFragment
-import ie.wit.fragments.BugReportFragment
-import ie.wit.fragments.BugTrackingFragment
+import ie.wit.fragments.*
 import ie.wit.main.BugTrackingApp
 import ie.wit.utils.*
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
@@ -41,7 +43,15 @@ class Home : AppCompatActivity(),
         setContentView(R.layout.home)
         setSupportActionBar(toolbar)
         app = application as BugTrackingApp
-
+        app.currentLocation = Location("Default").apply {
+            latitude = 52.245696
+            longitude = -7.139102
+        }
+        app.locationClient = LocationServices.getFusedLocationProviderClient(this)
+        if(checkLocationPermissions(this)) {
+            // todo get the current location
+            setCurrentLocation(app)
+        }
 
 
         navView.setNavigationItemSelectedListener(this)
@@ -54,7 +64,10 @@ class Home : AppCompatActivity(),
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        navView.getHeaderView(0).nav_header_email.text = app.auth.currentUser?.email
+        if(app.currentUser.email != null)
+            navView.getHeaderView(0).nav_header_email.text = app.currentUser.email
+        else
+            navView.getHeaderView(0).nav_header_email.text = "No Email Specified..."
 
         //Checking if Google User, upload google profile pic
         checkExistingPhoto(app,this)
@@ -74,6 +87,7 @@ class Home : AppCompatActivity(),
         when (item.itemId) {
             R.id.nav_bugform -> navigateTo(BugTrackingFragment.newInstance())
             R.id.nav_report -> navigateTo(BugReportFragment.newInstance())
+            R.id.nav_favourite -> navigateTo(FavouritesFragment.newInstance())
             R.id.nav_report_all ->
                 navigateTo(BugAllReportsFragment.newInstance())
             R.id.nav_aboutus -> navigateTo(AboutUs.newInstance())
@@ -89,6 +103,20 @@ class Home : AppCompatActivity(),
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_home, menu)
         return true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (isPermissionGranted(requestCode, grantResults)) {
+            // todo get the current location
+            setCurrentLocation(app)
+        } else {
+            // permissions denied, so use the default location
+            app.currentLocation = Location("Default").apply {
+                latitude = 52.245696
+                longitude = -7.139102
+            }
+        }
+        Log.v("Donation", "Home LAT: ${app.currentLocation.latitude} LNG: ${app.currentLocation.longitude}")
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -116,10 +144,10 @@ class Home : AppCompatActivity(),
             .commit()
     }
 
-    private fun signOut()
-    {
-        app.auth.signOut()
-        startActivity<Login>()
+    private fun signOut() {
+        AuthUI.getInstance()
+            .signOut(this)
+            .addOnCompleteListener { startActivity<Login>() }
         finish()
     }
 

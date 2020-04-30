@@ -55,7 +55,7 @@ class EditFragment : Fragment(), AnkoLogger {
 
             updateBugData()
             updateBugTracking(editBugs!!.uid, editBugs!!)
-            updateUserBugTracking(app.auth.currentUser!!.uid,
+            updateUserBugTracking(app.currentUser!!.uid,
                 editBugs!!.uid, editBugs!!)
 
         }

@@ -23,6 +23,7 @@ import org.jetbrains.anko.info
 class BugTrackingFragment : Fragment(), AnkoLogger {
     var bug = BugTrackingModel()
     var edit = false
+    var favourite = false
 
     lateinit var app: BugTrackingApp
     lateinit var loader : AlertDialog
@@ -48,6 +49,7 @@ class BugTrackingFragment : Fragment(), AnkoLogger {
 
 
         setButtonListener(root)
+        setFavouriteListener(root)
         return root;
     }
 
@@ -72,8 +74,9 @@ class BugTrackingFragment : Fragment(), AnkoLogger {
             else if (BugRadio.checkedRadioButtonId == R.id.Bug5) "5" else "0"
 
 
-            writeNewBugTracking(BugTrackingModel(title = title, descriptions = description, bugimportance = bugNumber, profilepic = app.userImage.toString(),
-                email = app.auth.currentUser?.email))
+            writeNewBugTracking(BugTrackingModel(title = title, descriptions = description, bugimportance = bugNumber, latitude = app.currentLocation.latitude,
+                longitude = app.currentLocation.longitude, profilepic = app.userImage.toString(), isfavourite = favourite,
+                email = app.currentUser?.email))
 
             val fragment = BugReportFragment()
             val fragmentManager = activity!!.supportFragmentManager
@@ -84,12 +87,26 @@ class BugTrackingFragment : Fragment(), AnkoLogger {
             }
         }
 
+    fun setFavouriteListener (layout: View) {
+        layout.imagefavourite.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                if (!favourite) {
+                    layout.imagefavourite.setImageResource(android.R.drawable.star_big_on)
+                    favourite = true
+                }
+                else {
+                    layout.imagefavourite.setImageResource(android.R.drawable.star_big_off)
+                    favourite = false
+                }
+            }
+        })
+    }
 
     fun writeNewBugTracking(bugTracking: BugTrackingModel) {
-        // Create new donation at /donations & /donations/$uid
+
         showLoader(loader, "Adding Bug Tracking to Firebase")
         info("Firebase DB Reference : $app.database")
-        val uid = app.auth.currentUser!!.uid
+        val uid = app.currentUser!!.uid
         val key = app.database.child("bugTrackings").push().key
         if (key == null) {
             info("Firebase Error : Key Empty")
@@ -105,6 +122,11 @@ class BugTrackingFragment : Fragment(), AnkoLogger {
         app.database.updateChildren(childUpdates)
         hideLoader(loader)
     }
+
+
+
+
+
 
 
 }
