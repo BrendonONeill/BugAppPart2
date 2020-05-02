@@ -148,7 +148,7 @@ fun addMapMarkers(dl : ArrayList<BugTrackingModel>, map: GoogleMap) {
                 .title("${it.title}     Importance Level: ${it.bugimportance}")
                 .snippet("Description: ${it.descriptions}")
                 .icon(
-                    BitmapDescriptorFactory.fromResource(R.mipmap.ic_homer_map))
+                    BitmapDescriptorFactory.fromResource(R.drawable.mapface))
         )
     }
 }

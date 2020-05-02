@@ -26,8 +26,9 @@ class BugTrackingApp : Application() {
 
     lateinit var currentUser: FirebaseUser
     lateinit var database: DatabaseReference
-    lateinit var googleSignInClient: GoogleSignInClient
     lateinit var storage: StorageReference
+    lateinit var googleSignInClient: GoogleSignInClient
+
     lateinit var userImage: Uri
     lateinit var currentLocation : Location
     lateinit var locationClient : FusedLocationProviderClient

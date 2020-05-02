@@ -43,7 +43,7 @@ class BugViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             else
                 itemView.setOnClickListener { listener.onBugClick(bugTracking) }
 
-            if(bugTracking.isfavourite) itemView.imagefavourite.setImageResource(android.R.drawable.star_big_on)
+            if(bugTracking.isfavourite) itemView.imagefavourite.setImageResource(R.drawable.fav_on)
 
             if(!bugTracking.profilepic.isEmpty()) {
                 com.squareup.picasso.Picasso.get().load(bugTracking.profilepic.toUri())
@@ -52,7 +52,7 @@ class BugViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     .into(itemView.imageIcon)
             }
             else
-                itemView.imageIcon.setImageResource(ie.wit.R.mipmap.ic_launcher_homer_round)
+                itemView.imageIcon.setImageResource(ie.wit.R.drawable.brendon1)
 
         }
     }

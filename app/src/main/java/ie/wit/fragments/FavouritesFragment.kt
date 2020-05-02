@@ -46,12 +46,12 @@ class FavouritesFragment : Fragment() {
                 app.mMap.clear()
                 setMapMarker(app)
                 if (!viewFavourites) {
-                    imageMapFavourites.setImageResource(R.drawable.ic_fav_on)
+                    imageMapFavourites.setImageResource(R.drawable.fav_on)
                     viewFavourites = true
                     getFavouriteBugs(app)
                 }
                 else {
-                    imageMapFavourites.setImageResource(R.drawable.ic_fav_off)
+                    imageMapFavourites.setImageResource(R.drawable.fav_off)
                     viewFavourites = false
                     getAllBugs(app)
                 }

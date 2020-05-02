@@ -6,21 +6,21 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_bugform"
-            android:icon="@drawable/ic_menu_report"
+            android:icon="@drawable/bug_tracking"
             android:title="@string/menu_bugForm" />
         <item
             android:id="@+id/nav_report"
-            android:icon="@drawable/ic_menu_report"
+            android:icon="@drawable/bug_report"
             android:title="@string/menu_bugReport" />
 
         <item
             android:id="@+id/nav_report_all"
-            android:icon="@drawable/ic_menu_report"
+            android:icon="@drawable/all_bugs"
             android:title="@string/menu_report_all" />
 
         <item
             android:id="@+id/nav_favourite"
-            android:icon="@drawable/ic_menu_report"
+            android:icon="@drawable/fav"
             android:title="@string/favourite" />
        
         <item
@@ -29,18 +29,7 @@
             android:title="@string/menu_about" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="@string/menu_share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/menu_send" />
-        </menu>
-    </item>
+
 
     <item android:title="Access Control">
         <menu>

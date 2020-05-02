@@ -45,7 +45,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="21dp"
             android:layout_toEndOf="@id/bugDescription"
-            app:srcCompat="@android:drawable/star_big_off"/>
+            app:srcCompat="@drawable/fav_off"/>
 
         <TextView
             android:id="@+id/bugFormNumber"

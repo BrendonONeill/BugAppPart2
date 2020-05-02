@@ -116,14 +116,13 @@ class Home : AppCompatActivity(),
                 longitude = -7.139102
             }
         }
-        Log.v("Donation", "Home LAT: ${app.currentLocation.latitude} LNG: ${app.currentLocation.longitude}")
+        Log.v("BugTracking", "Home LAT: ${app.currentLocation.latitude} LNG: ${app.currentLocation.longitude}")
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.action_bugForms-> toast("You Selected Forms")
-            R.id.action_bugReport -> toast("You Selected Report")
+
         }
         return super.onOptionsItemSelected(item)
     }

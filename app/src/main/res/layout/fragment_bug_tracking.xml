@@ -54,7 +54,7 @@
         app:layout_constraintHorizontal_bias="0.788"
         app:layout_constraintStart_toEndOf="@+id/titlebug"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/star_big_off" />
+        app:srcCompat="@drawable/fav_off" />
 
     <TextView
         android:id="@+id/textView"

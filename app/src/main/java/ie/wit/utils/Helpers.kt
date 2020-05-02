@@ -35,7 +35,7 @@ fun createLoader(activity: FragmentActivity) : AlertDialog {
         .setView(R.layout.loading)
     var loader = loaderBuilder.create()
     loader.setTitle(R.string.app_name)
-    loader.setIcon(R.mipmap.ic_launcher_homer_round)
+    loader.setIcon(R.drawable.bug)
 
     return loader
 }
@@ -104,7 +104,7 @@ fun uploadImageView(app: BugTrackingApp, imageView: ImageView) {
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 app.userImage = task.result!!.toString().toUri()
-                updateAllDonations(app)
+                updateAllBugs(app)
                 writeImageRef(app,app.userImage.toString())
                 Picasso.get().load(app.userImage)
                     .resize(180, 180)
@@ -115,104 +115,104 @@ fun uploadImageView(app: BugTrackingApp, imageView: ImageView) {
     }
 }
 
-    fun writeImageRef(app: BugTrackingApp, imageRef: String) {
-        val userId = app.currentUser!!.uid
-        val values = UserProfilePicModel(userId,imageRef).toMap()
-        val childUpdates = HashMap<String, Any>()
+fun writeImageRef(app: BugTrackingApp, imageRef: String) {
+    val userId = app.currentUser!!.uid
+    val values = UserProfilePicModel(userId,imageRef).toMap()
+    val childUpdates = HashMap<String, Any>()
 
-        childUpdates["/user-photos/$userId"] = values
-        app.database.updateChildren(childUpdates)
-    }
+    childUpdates["/user-photos/$userId"] = values
+    app.database.updateChildren(childUpdates)
+}
 
-    fun updateAllDonations(app: BugTrackingApp) {
-        val userId = app.currentUser!!.uid
-        val userEmail = app.currentUser!!.email
-        var donationRef = app.database.ref.child("donations")
-            .orderByChild("email")
-        val userdonationRef = app.database.ref.child("user-donations")
-            .child(userId).orderByChild("uid")
+fun updateAllBugs(app: BugTrackingApp) {
+    val userId = app.currentUser!!.uid
+    val userEmail = app.currentUser!!.email
+    var bugRef = app.database.ref.child("bugTrackings")
+        .orderByChild("email")
+    val userbugRef = app.database.ref.child("user-bugTrackings")
+        .child(userId).orderByChild("uid")
 
-        donationRef.equalTo(userEmail).addListenerForSingleValueEvent(
-            object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {}
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.children.forEach {
-                        it.ref.child("profilepic")
-                            .setValue(app.userImage.toString())
-                    }
+    bugRef.equalTo(userEmail).addListenerForSingleValueEvent(
+        object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {}
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach {
+                    it.ref.child("profilepic")
+                        .setValue(app.userImage.toString())
                 }
-            })
+            }
+        })
 
-        userdonationRef.addListenerForSingleValueEvent(
-            object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {}
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.children.forEach {
-                        it.ref.child("profilepic")
-                            .setValue(app.userImage.toString())
-                    }
+    userbugRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {}
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach {
+                    it.ref.child("profilepic")
+                        .setValue(app.userImage.toString())
                 }
-            })
+            }
+        })
 
-        writeImageRef(app, app.userImage.toString())
-    }
+    writeImageRef(app, app.userImage.toString())
+}
 
-    fun validatePhoto(app: BugTrackingApp, activity: Activity) {
+fun validatePhoto(app: BugTrackingApp, activity: Activity) {
 
-        var imageUri: Uri? = null
-        val imageExists = app.userImage.toString().length > 0
-        val googlePhotoExists = app.currentUser?.photoUrl != null
+    var imageUri: Uri? = null
+    val imageExists = app.userImage.toString().length > 0
+    val googlePhotoExists = app.currentUser?.photoUrl != null
 
-        if(imageExists)
-            imageUri = app.userImage
+    if(imageExists)
+        imageUri = app.userImage
+    else
+        if (googlePhotoExists)
+            imageUri = app.currentUser?.photoUrl!!
+
+    if (googlePhotoExists || imageExists) {
+        if(!app.currentUser?.displayName.isNullOrEmpty())
+            activity.navView.getHeaderView(0)
+                .nav_header_name.text = app.currentUser?.displayName
         else
-            if (googlePhotoExists)
-                imageUri = app.currentUser?.photoUrl!!
+            activity.navView.getHeaderView(0)
+                .nav_header_name.text = activity.getText(R.string.nav_header_title)
 
-        if (googlePhotoExists || imageExists) {
-            if(!app.currentUser?.displayName.isNullOrEmpty())
-                activity.navView.getHeaderView(0)
-                    .nav_header_name.text = app.currentUser?.displayName
-            else
-                activity.navView.getHeaderView(0)
-                    .nav_header_name.text = activity.getText(R.string.nav_header_title)
-
-            Picasso.get().load(imageUri)
-                .resize(180, 180)
-                .transform(CropCircleTransformation())
-                .into(activity.navView.getHeaderView(0).imageView, object : Callback {
-                    override fun onSuccess() {
-                        // Drawable is ready
-                        uploadImageView(app,activity.navView.getHeaderView(0).imageView)
-                    }
-                    override fun onError(e: Exception) {}
-                })
-        }
-        else    // New Regular User, upload default pic of homer
-        {
-            activity.navView.getHeaderView(0).imageView.setImageResource(R.mipmap.ic_launcher_homer_round)
-            uploadImageView(app, activity.navView.getHeaderView(0).imageView)
-        }
-    }
-
-    fun checkExistingPhoto(app: BugTrackingApp,activity: Activity) {
-
-        app.userImage = "".toUri()
-
-        app.database.child("user-photos").orderByChild("uid")
-            .equalTo(app.currentUser!!.uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-
-                override fun onDataChange(snapshot: DataSnapshot ) {
-                    snapshot.children.forEach {
-                        val usermodel = it.getValue<UserProfilePicModel>(UserProfilePicModel::class.java)
-                        app.userImage = usermodel!!.profilepic.toUri()
-                    }
-                    validatePhoto(app,activity)
+        Picasso.get().load(imageUri)
+            .resize(180, 180)
+            .transform(CropCircleTransformation())
+            .into(activity.navView.getHeaderView(0).imageView, object : Callback {
+                override fun onSuccess() {
+                    // Drawable is ready
+                    uploadImageView(app,activity.navView.getHeaderView(0).imageView)
                 }
-                override fun onCancelled(databaseError: DatabaseError ) {}
+                override fun onError(e: Exception) {}
             })
     }
+    else    // New Regular User, upload default pic of homer
+    {
+        activity.navView.getHeaderView(0).imageView.setImageResource(R.drawable.brendon1)
+        uploadImageView(app, activity.navView.getHeaderView(0).imageView)
+    }
+}
+
+fun checkExistingPhoto(app: BugTrackingApp,activity: Activity) {
+
+    app.userImage = "".toUri()
+
+    app.database.child("user-photos").orderByChild("uid")
+        .equalTo(app.currentUser!!.uid)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot ) {
+                snapshot.children.forEach {
+                    val usermodel = it.getValue<UserProfilePicModel>(UserProfilePicModel::class.java)
+                    app.userImage = usermodel!!.profilepic.toUri()
+                }
+                validatePhoto(app,activity)
+            }
+            override fun onCancelled(databaseError: DatabaseError ) {}
+        })
+}
 
 
 

@@ -19,7 +19,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:clickable="true"
-        android:src="@drawable/ic_fav_off"
+        android:src="@drawable/fav_off"
         app:backgroundTint="@color/colorPrimaryDark"
         app:maxImageSize="30dp" />
 

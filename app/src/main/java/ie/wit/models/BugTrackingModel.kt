@@ -13,7 +13,6 @@ data class BugTrackingModel(
     var descriptions: String = "N/A",
     var bugimportance: String = "N/A",
     var message: String = "the message",
-    var upvotes: Int = 0,
     var profilepic: String = "",
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
@@ -28,15 +27,15 @@ data class BugTrackingModel(
 
             "uid" to uid,
             "title" to title,
+            "profilepic" to profilepic,
             "descriptions" to descriptions,
             "bugimportance" to bugimportance,
             "message" to message,
             "latitude" to latitude,
             "longitude" to longitude,
-            "upvote" to upvotes,
             "email" to email,
-            "isfavourite" to isfavourite,
-            "profilepic" to profilepic
+            "isfavourite" to isfavourite
+
         )
     }
 }
